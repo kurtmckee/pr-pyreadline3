@@ -111,14 +111,22 @@ class AnsiWriter(object):
                     # switch on bold (i.e. intensify foreground color)
                     elif part == "1":
                         attr.bold = True
-                    elif len(part) == 2 and "30" <= part <= "37":  # set foreground color
-                        attr.color = trtable[int(part) - 30]
-                    elif len(part) == 2 and "40" <= part <= "47":  # set background color
-                        attr.backgroundcolor = trtable[int(part) - 40]
+                    elif len(part) == 2:
+                        if part == "22":  # Normal foreground color
+                            attr.bold = False
+                        elif "30" <= part <= "37": # set foreground color
+                            attr.color = trtable[int(part) - 30]
+                        elif part == "39":  # Default foreground color
+                            attr.color = self.defaultstate.color
+                        elif "40" <= part <= "47":  # set background color
+                            attr.background = trtable[int(part) - 40]
+                        elif part == "49":  # Default background color
+                           attr.background = self.defaultstate.background
                 continue
             n += len(chunk)
-            if True:
-                res.append((attr.copy(), chunk))
+            
+            res.append((attr.copy(), chunk))
+
         return n, res
 
     def parse_color(self, text, attr=None):
